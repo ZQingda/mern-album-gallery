@@ -17,7 +17,7 @@ class App extends Component {
         <Link to={`/album/create`}>Album Create</Link><br/>
         <Link to={`/albums`}>Album List</Link>
         <Switch>
-          <Route path='/image/upload' component={Upload} albumid='59c8b50636f9774444462a45'/>
+          <Route path='/image/upload' component={Upload} albumid='59c8b50636f9774444462a45' />
           <Route path='/album/create' component={AlbumCreate} />
           <Route exact path='/albums' component={AlbumList} />
           <Route path='/albums/:albumid' component={AlbumView} />

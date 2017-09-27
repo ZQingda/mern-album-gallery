@@ -18,8 +18,13 @@ class Upload extends Component {
 
         request.post('http://192.168.50.117:3001/image/upload')
             .send(photo)
-            .end(function (err, res) {
+            .end((err, res) => {
                 if (err) { console.log('HANDLE ERROR: ' + err); }
+                
+                if (typeof this.props.update === 'function') {
+                    this.props.update();
+                }
+
                 return res;
             });
     }
