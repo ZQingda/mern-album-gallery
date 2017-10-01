@@ -30,7 +30,6 @@ class AlbumView extends Component {
         .end((err, res) => {
             if (err) { console.log('HANDLE ERROR: ' + err); }
             this.setState({ images: res.body });
-            //console.log(this.state.images);
         });
     }
 
@@ -39,10 +38,10 @@ class AlbumView extends Component {
             currentImage : e.target.src,
             currentIndex : parseInt(e.target.dataset.key),
             lightbox: true
-        }, function() {
+        }, /*function() {
             console.log('Passed state: ');
             console.log(this.state)
-        });
+        }*/);
 
     }
 

@@ -10,7 +10,7 @@ class Upload extends Component {
     }
 
     handleImageUpload(file) {
-        console.log(this.props.albumid);
+        //console.log(this.props.albumid);
         var idused = this.props.albumid ? this.props.albumid : '59c893f8890bfa34e4f639ad';
         var photo = new FormData();
         photo.append('photo', file[0]);

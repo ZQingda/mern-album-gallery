@@ -20,9 +20,9 @@ class AlbumList extends Component {
         request.get('http://192.168.50.117:3001/album/list')
             .end((err, res) => {
                 if (err) { console.log('HANDLE ERROR: ' + err); }
-                console.log(res.body[0]);
+                //console.log(res.body[0]);
                 this.setState({ albums: res.body });
-                console.log(this.state.albums);
+                //console.log(this.state.albums);
                 return res;
             });
 

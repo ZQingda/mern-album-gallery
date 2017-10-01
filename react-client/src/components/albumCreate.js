@@ -25,10 +25,10 @@ class AlbumCreate extends Component {
     }
 
     postAlbumSubmission(e) {
-        console.log(this.state.albumName);
-        console.log(this.state.albumDesc);
+        //console.log(this.state.albumName);
+        //console.log(this.state.albumDesc);
 
-        console.log('ALBUM SUBMIT');
+        //console.log('ALBUM SUBMIT');
         e.preventDefault();
         request.post('http://192.168.50.117:3001/album/create')
             .send({
