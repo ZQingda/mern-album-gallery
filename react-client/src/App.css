@@ -36,7 +36,7 @@
   background-color: #000000;
   background-color: rgba(0,0,0,0.9);
 
-  transition: opacity 500ms linear;
+  transition: visibility 500ms linear, opacity 500ms linear;
 }
 
 .lightbox.show {
