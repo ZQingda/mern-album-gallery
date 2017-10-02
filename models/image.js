@@ -7,7 +7,7 @@ var ImageSchema = Schema({
     path: { type: String, max: 100, required: true },
     date: { type: String, required: true },
     description: { type: String, required: false},
-    albums: [{type: Schema.ObjectId, ref: 'Album', required: false}],
+    //albums: [{type: Schema.ObjectId, ref: 'Album', required: false}],
     exif: {
       make: { type: String, default: 'unknown' },
       model: { type: String, default: 'unknown' },

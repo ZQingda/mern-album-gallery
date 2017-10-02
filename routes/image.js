@@ -7,6 +7,8 @@ var router = express.Router();
 var upload = multer({ dest: './public/uploads'})
 
 /* POST image. */
+router.post('/delete', image_controller.image_delete);
+
 router.get('/', function(req, res) {
     res.send('Not implemented!!');
 });

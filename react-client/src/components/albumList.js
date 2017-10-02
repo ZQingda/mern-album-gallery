@@ -31,12 +31,15 @@ class AlbumList extends Component {
 
     render() {
         var albumNav = this.state.albums.map((album) =>
-            <li key={album._id}><Link to={`/albums/${album._id}`}>{album.name}</Link></li>
+            <li key={album._id}><Link to={{
+                pathname: `/albums/${album.name}`,
+                state: {albumid: album._id}
+            }}>{album.name}</Link></li>
         );
         return (
             <div className='ABCD'>
                 <ul>
-                    <li><Link to={`/albums/all`}>All images</Link></li>
+                    <li><Link to={{pathname : `/albums/all`, state: {albumid: 'all'}}}>All images</Link></li>
                     {albumNav}
                 </ul>
             </div>

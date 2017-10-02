@@ -19,7 +19,7 @@ exports.image_post = function (req, res, next) {
             {
                 path: req.files[0].path,
                 date: !error && exifData.exif.CreateDate ? exifData.exif.CreateDate : !error && exifData.exif.ModifyDate ? exifData.exif.ModifyDate : 'unknown',
-                albums: albums,
+                //albums: albums,
                 exif: {
                     make: !error && exifData.image.Make ? exifData.image.Make : 'unknown',
                     model: !error && exifData.image.Model ? exifData.image.Model : 'unknown',
@@ -60,3 +60,33 @@ exports.image_post = function (req, res, next) {
 
     //res.end(req.file);
 };
+
+exports.image_delete = function(req, res, next) {
+    console.log('DELETING IMAGES');
+    console.log(req.body);
+    console.log(req.body.albumid);
+    console.log(req.body.deletionIds);
+    if (req.body.albumid && req.body.albumid != 'all') {
+        Album.findByIdAndUpdate(req.body.albumid,
+            { $pullAll : {'images' : req.body.deletionIds}
+        }, function(err) {
+            if(err) {
+                console.log('Delete from album error: ' + err);
+                next(err);
+            }
+        });
+    }
+    if (req.body.deletionIds) {
+        Image.remove({ _id : { $in: req.body.deletionIds}},
+            function(err) {
+                if(err) {
+                    console.log('Image delete error: ' + err);
+                    next(err);
+                }
+            }
+        );
+    }
+
+    res.end();
+
+}

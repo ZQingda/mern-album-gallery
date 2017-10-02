@@ -10,6 +10,8 @@ router.get('/create', function(req, res) {
 
 router.post('/create', album_controller.album_create);
 
+router.post('/delete', album_controller.album_delete);
+
 router.get('/list', album_controller.album_list);
 
 router.get('/get', album_controller.album_get);
