@@ -34,12 +34,12 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'react-client/build')));
+app.use(express.static(path.join(__dirname, 'front')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/react-client/build/index.html')
+  res.sendFile(__dirname + '/front/index.html')
 });
 app.use('/users', users);
 app.use('/image', image);

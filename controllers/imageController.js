@@ -8,7 +8,7 @@ exports.image_post = function (req, res, next) {
     console.log('PATH: ' + '../' + req.files[0].path);
     console.log(req.body);
 
-    var albums = req.body.albumid === 'noid' ? [] : [req.body.albumid];    
+    var albums = req.body.albumid === 'noid' ? [] : [req.body.albumid];
 
     new ExifImage({ image: req.files[0].path }, function (error, exifData) {
         if (error) {
@@ -32,15 +32,15 @@ exports.image_post = function (req, res, next) {
         );
 
         image.save(function (err, i) {
-            if (err) { 
+            if (err) {
                 console.log('Image Save error');
-                return next(err); 
+                return next(err);
             } else {
-                if(albums != []) {
+                if (albums != []) {
                     albums.map((albumid) => {
                         Album.findByIdAndUpdate(albumid,
-                            { '$push' : {'images' : i._id } },
-                            function(err, a) {
+                            { '$push': { 'images': i._id } },
+                            function (err, a) {
                                 if (err) {
                                     console.log('Album update error');
                                     return next(err);
@@ -52,8 +52,8 @@ exports.image_post = function (req, res, next) {
             }
         });
 
-        
-        
+
+
 
         res.end(req.file);
     });
@@ -61,25 +61,29 @@ exports.image_post = function (req, res, next) {
     //res.end(req.file);
 };
 
-exports.image_delete = function(req, res, next) {
+exports.image_delete = function (req, res, next) {
     console.log('DELETING IMAGES');
     console.log(req.body);
     console.log(req.body.albumid);
     console.log(req.body.deletionIds);
-    if (req.body.albumid && req.body.albumid != 'all') {
-        Album.findByIdAndUpdate(req.body.albumid,
-            { $pullAll : {'images' : req.body.deletionIds}
-        }, function(err) {
-            if(err) {
+    // if (req.body.albumid && req.body.albumid != 'all') {
+    Album.update(
+        {},
+        { $pullAll: { 'images': req.body.deletionIds } },
+        { multi: true },
+        function (err, raw) {
+            console.log('Mongo raw output: ');
+            console.log(raw);
+            if (err) {
                 console.log('Delete from album error: ' + err);
                 next(err);
             }
         });
-    }
+    // }
     if (req.body.deletionIds) {
-        Image.remove({ _id : { $in: req.body.deletionIds}},
-            function(err) {
-                if(err) {
+        Image.remove({ _id: { $in: req.body.deletionIds } },
+            function (err) {
+                if (err) {
                     console.log('Image delete error: ' + err);
                     next(err);
                 }
