@@ -14,6 +14,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var image = require('./routes/image');
 var album = require('./routes/album');
+var tag = require('./routes/tag');
 
 // express setup
 var app = express();
@@ -44,6 +45,7 @@ app.get('/', function(req, res) {
 app.use('/users', users);
 app.use('/image', image);
 app.use('/album', album);
+app.use('/tag', tag);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

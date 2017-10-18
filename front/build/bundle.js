@@ -35367,7 +35367,7 @@
 	        _react2.default.createElement(
 	          _reactRouterDom.Switch,
 	          null,
-	          _react2.default.createElement(_reactRouterDom.Route, { path: '/image/upload', component: _upload2.default, albumid: '59c8b50636f9774444462a45' }),
+	          _react2.default.createElement(_reactRouterDom.Route, { path: '/image/upload', component: _upload2.default }),
 	          _react2.default.createElement(_reactRouterDom.Route, { path: '/album/create', component: _albumCreate2.default }),
 	          _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/albums', component: _albumList2.default }),
 	          _react2.default.createElement(_reactRouterDom.Route, { path: '/albums/:albumid', component: _albumView2.default })
@@ -35502,7 +35502,7 @@
 	                { className: 'App' },
 	                _react2.default.createElement(
 	                    'form',
-	                    { onSubmit: this._handleImageUpload, name: 'image', enctype: 'multipart/form-data', id: 'TestForm' },
+	                    { onSubmit: this._handleImageUpload, name: 'image', encType: 'multipart/form-data', id: 'TestForm' },
 	                    'Select image to upload:',
 	                    _react2.default.createElement('input', { type: 'file', name: 'photo', id: 'imageFile', accept: 'image/*' }),
 	                    _react2.default.createElement('input', { type: 'submit', value: 'Upload Image', name: 'submit' })
@@ -38544,12 +38544,14 @@
 
 	        _this.state = {
 	            albumName: '',
-	            albumDesc: ''
+	            albumDesc: '',
+	            tags: ''
 	        };
 
 	        _this.postAlbumSubmission = _this.postAlbumSubmission.bind(_this);
 	        _this.handleNameChange = _this.handleNameChange.bind(_this);
 	        _this.handleDescChange = _this.handleDescChange.bind(_this);
+	        _this.handleTagsChange = _this.handleTagsChange.bind(_this);
 	        return _this;
 	    }
 
@@ -38564,6 +38566,11 @@
 	            this.setState({ albumDesc: e.target.value });
 	        }
 	    }, {
+	        key: 'handleTagsChange',
+	        value: function handleTagsChange(e) {
+	            this.setState({ albumTags: e.target.value });
+	        }
+	    }, {
 	        key: 'postAlbumSubmission',
 	        value: function postAlbumSubmission(e) {
 	            //console.log(this.state.albumName);
@@ -38573,7 +38580,8 @@
 	            e.preventDefault();
 	            _superagent2.default.post('http://192.168.50.117:3001/album/create').send({
 	                albumName: this.state.albumName,
-	                albumDesc: this.state.albumDesc
+	                albumDesc: this.state.albumDesc,
+	                albumTags: this.state.albumTags
 	            }).end(function (err, res) {
 	                if (err) {
 	                    console.log('HANDLE ERROR: ' + err);
@@ -38602,6 +38610,12 @@
 	                        'Album Description'
 	                    ),
 	                    _react2.default.createElement('input', { type: 'text', name: 'albumDesc', id: 'albumDesc', onChange: this.handleDescChange }),
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'albumTags' },
+	                        'Album Tags'
+	                    ),
+	                    _react2.default.createElement('input', { type: 'text', name: 'albumTags', id: 'albumTags', onChange: this.handleTagsChange }),
 	                    _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
 	                )
 	            );
@@ -38767,15 +38781,17 @@
 
 	        _this.state = {
 	            images: [],
+	            album: {},
 	            currentImage: '',
 	            currentIndex: 0,
 	            lightbox: false,
 	            delete: false,
 	            selected: [],
-	            backToList: false
+	            backToList: false,
+	            newTags: []
 	        };
 
-	        _this.getImages = _this.getImages.bind(_this);
+	        _this.getAlbum = _this.getAlbum.bind(_this);
 	        _this.showImage = _this.showImage.bind(_this);
 	        _this.hideImage = _this.hideImage.bind(_this);
 	        _this.prevImage = _this.prevImage.bind(_this);
@@ -38784,27 +38800,46 @@
 	        _this.handleDeletion = _this.handleDeletion.bind(_this);
 	        _this.select = _this.select.bind(_this);
 	        _this.deleteAlbum = _this.deleteAlbum.bind(_this);
+	        _this.addTags = _this.addTags.bind(_this);
+	        _this.removeTag = _this.removeTag.bind(_this);
+	        _this.handleNewTagsChange = _this.handleNewTagsChange.bind(_this);
 	        return _this;
 	    }
 
 	    _createClass(AlbumView, [{
-	        key: 'getImages',
-	        value: function getImages() {
+	        key: 'getAlbum',
+	        value: function getAlbum() {
 	            var _this2 = this;
 
-	            var albumQuery = this.props.location.state.albumid == 'all' ? {} : { albumid: this.props.location.state.albumid };
-	            //console.log(albumQuery);
-	            _superagent2.default.get('http://192.168.50.117:3001/album/get').query(albumQuery).end(function (err, res) {
-	                if (err) {
-	                    console.log('HANDLE ERROR: ' + err);
-	                }
-	                _this2.setState({ images: res.body });
-	            });
+	            if (this.props.location.state.albumid) {
+	                var albumQuery = this.props.location.state.albumid == 'all' ? {} : { albumid: this.props.location.state.albumid };
+	                console.log(albumQuery);
+	                _superagent2.default.get('http://192.168.50.117:3001/album/get').query(albumQuery).end(function (err, res) {
+	                    if (err) {
+	                        console.log('HANDLE ERROR: ' + err);
+	                    }
+	                    _this2.setState({
+	                        images: res.body.album.images ? res.body.album.images : res.body.images,
+	                        album: res.body.album ? res.body.album : null
+	                    });
+	                    console.log('Tried getting');
+	                });
+	            } else if (this.props.location.state.tagid) {
+	                var tagQuery = this.props.location.state.tagid;
+	                _superagent2.default.get('http://192.168.50.117:3001/tag/getall').query(tagQuery).end(function (err, res) {
+	                    if (err) {
+	                        console.log('HANDLE TAG ALL ERR : ' + err);
+	                    }
+	                    _this2.setState({
+	                        images: res.body
+	                    });
+	                });
+	            }
 	        }
 	    }, {
 	        key: 'showImage',
 	        value: function showImage(e) {
-	            console.log(e.target.childNodes);
+	            //console.log(e.target.childNodes);
 	            this.setState({
 	                currentImage: e.target.src,
 	                currentIndex: parseInt(e.target.dataset.key),
@@ -38845,7 +38880,7 @@
 	    }, {
 	        key: 'toggleDeletion',
 	        value: function toggleDeletion(e) {
-	            console.log('Deletion toggled');
+	            //console.log('Deletion toggled');
 	            e.preventDefault();
 	            this.setState({
 	                delete: true
@@ -38856,8 +38891,8 @@
 	    }, {
 	        key: 'handleDeletion',
 	        value: function handleDeletion(e) {
-	            console.log('Handling Deletion');
-	            console.log(this.state);
+	            //console.log('Handling Deletion');
+	            //console.log(this.state);
 	            e.preventDefault();
 
 	            var albumid = this.props.location.state.albumid;
@@ -38881,7 +38916,7 @@
 	                selected: []
 	            });
 
-	            this.getImages();
+	            this.getAlbum();
 	        }
 	    }, {
 	        key: 'select',
@@ -38908,24 +38943,87 @@
 	            });
 	        }
 	    }, {
+	        key: 'handleNewTagsChange',
+	        value: function handleNewTagsChange(e) {
+	            this.setState({ newTags: e.target.value });
+	        }
+	    }, {
+	        key: 'addTags',
+	        value: function addTags(e) {
+	            var _this3 = this;
+
+	            e.preventDefault();
+
+	            var albumid = this.props.location.state.albumid;
+	            var newTags = this.state.newTags;
+
+	            _superagent2.default.post('http://192.168.50.117:3001/album/addtags').send({
+	                albumid: albumid,
+	                newTags: newTags
+	            }).end(function (err, res) {
+	                if (err) {
+	                    console.log('HANDLE ERROR: ' + err);
+	                }
+	                _this3.getAlbum();
+	            });
+	        }
+	    }, {
+	        key: 'removeTag',
+	        value: function removeTag(e) {
+	            var _this4 = this;
+
+	            e.preventDefault();
+
+	            var albumid = this.props.location.state.albumid;
+
+	            //console.log(e.target.dataset.tag);
+	            _superagent2.default.post('http://192.168.50.117:3001/album/removetag').send({
+	                albumid: albumid,
+	                tagid: this.state.album.tags[e.target.dataset.tag]._id
+	            }).end(function (err, res) {
+	                if (err) {
+	                    console.log('HANDLE ERROR: ' + err);
+	                }
+	                _this4.getAlbum();
+	                return res;
+	            });
+	        }
+	    }, {
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
-	            this.getImages();
+	            this.getAlbum();
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this3 = this;
+	            var _this5 = this;
 
+	            console.log(this.state.album);
+	            console.log(this.state.images);
 	            var albumid = this.props.location.state.albumid;
-	            var images = this.state.images.map(function (image, index) {
+	            var images = this.state.album.images ? this.state.album.images : this.state.images;
+
+	            var imagePresentation = images.map(function (image, index) {
 	                var link = image.path.substr(6);
 	                return _react2.default.createElement(
 	                    'div',
-	                    { className: 'imgWrap', onClick: _this3.deleteSelect },
-	                    _react2.default.createElement('img', { src: link, alt: 'cannot find', onClick: _this3.state.delete ? _this3.select : _this3.showImage, 'data-key': index })
+	                    { className: 'imgWrap', onClick: _this5.deleteSelect, key: index },
+	                    _react2.default.createElement('img', { src: link, alt: 'cannot find', onClick: _this5.state.delete ? _this5.select : _this5.showImage, 'data-key': index })
 	                );
 	            });
+
+	            var tags = this.state.album.tags ? this.state.album.tags.map(function (tag, index) {
+	                return _react2.default.createElement(
+	                    'div',
+	                    { className: 'tagWrap', key: index },
+	                    tag.name,
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: _this5.removeTag, 'data-tag': index },
+	                        'Delete tag'
+	                    )
+	                );
+	            }) : null;
 
 	            if (this.state.backToList) {
 	                return _react2.default.createElement(_reactRouterDom.Redirect, { push: true, to: '/albums' });
@@ -38933,11 +39031,7 @@
 	                return _react2.default.createElement(
 	                    'div',
 	                    { className: 'ABCD' },
-	                    'TEST IMAGE DISPLAY ',
-	                    albumid,
-	                    ' ',
-	                    _react2.default.createElement('br', null),
-	                    _react2.default.createElement(_upload2.default, { albumid: albumid, update: this.getImages }),
+	                    _react2.default.createElement(_upload2.default, { albumid: albumid, update: this.getAlbum }),
 	                    this.props.location.state.albumid != 'all' && _react2.default.createElement(
 	                        'button',
 	                        { onClick: this.deleteAlbum },
@@ -38953,7 +39047,19 @@
 	                        'Select for deletion'
 	                    ),
 	                    this.state.delete ? 'DELETE IS ON' : 'DELETE IS OFF',
-	                    images,
+	                    tags,
+	                    imagePresentation,
+	                    _react2.default.createElement(
+	                        'form',
+	                        { onSubmit: this.addTags, id: 'newTags' },
+	                        _react2.default.createElement(
+	                            'label',
+	                            { htmlFor: 'albumNewTags' },
+	                            'New Tag(s)'
+	                        ),
+	                        _react2.default.createElement('input', { type: 'text', name: 'albumNewTags', id: 'albumNewTags', onChange: this.handleNewTagsChange }),
+	                        _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
+	                    ),
 	                    _react2.default.createElement(_lightbox2.default, {
 	                        imageCount: this.state.images.length,
 	                        currentIndex: this.state.currentIndex,

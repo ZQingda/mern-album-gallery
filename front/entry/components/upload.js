@@ -75,7 +75,7 @@ class Upload extends Component {
         return (
             <div className="App">
 
-                <form onSubmit={this._handleImageUpload} name='image' enctype="multipart/form-data" id='TestForm'>
+                <form onSubmit={this._handleImageUpload} name='image' encType="multipart/form-data" id='TestForm'>
                     Select image to upload:
                     <input type="file" name="photo" id="imageFile" accept='image/*' />
                     <input type="submit" value="Upload Image" name="submit" />

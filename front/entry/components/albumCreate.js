@@ -8,12 +8,14 @@ class AlbumCreate extends Component {
         super(props);
         this.state = {
             albumName: '',
-            albumDesc: ''
+            albumDesc: '',
+            tags: ''
         }
 
         this.postAlbumSubmission = this.postAlbumSubmission.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
         this.handleDescChange = this.handleDescChange.bind(this);
+        this.handleTagsChange = this.handleTagsChange.bind(this);
     }
 
     handleNameChange(e) {
@@ -22,6 +24,10 @@ class AlbumCreate extends Component {
 
     handleDescChange(e) {
         this.setState({albumDesc: e.target.value});
+    }
+
+    handleTagsChange(e) {
+        this.setState({albumTags: e.target.value});
     }
 
     postAlbumSubmission(e) {
@@ -33,7 +39,8 @@ class AlbumCreate extends Component {
         request.post('http://192.168.50.117:3001/album/create')
             .send({
                 albumName: this.state.albumName,
-                albumDesc: this.state.albumDesc
+                albumDesc: this.state.albumDesc,
+                albumTags: this.state.albumTags
             })
             .end(function (err, res) {
                 if (err) { console.log('HANDLE ERROR: ' + err); }
@@ -50,6 +57,8 @@ class AlbumCreate extends Component {
                     <input type='text' name='albumName' id='albumName' onChange={this.handleNameChange}/>
                     <label htmlFor='albumDesc'>Album Description</label>
                     <input type='text' name='albumDesc' id='albumDesc' onChange={this.handleDescChange}/>
+                    <label htmlFor='albumTags'>Album Tags</label>
+                    <input type='text' name='albumTags' id='albumTags' onChange={this.handleTagsChange}/>
                     <input type="submit" value="Submit" />
                 </form>
             </div>

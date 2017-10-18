@@ -53,8 +53,7 @@ exports.image_post = function (req, res, next) {
         });
 
 
-
-
+        res.setHeader('Content-Type', 'application/json');
         res.end(req.file);
     });
 
@@ -91,6 +90,7 @@ exports.image_delete = function (req, res, next) {
         );
     }
 
+    res.setHeader('Content-Type', 'application/json');
     res.end();
 
 }

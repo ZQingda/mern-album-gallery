@@ -16,4 +16,8 @@ router.get('/list', album_controller.album_list);
 
 router.get('/get', album_controller.album_get);
 
+router.post('/addtags', album_controller.album_add_tags);
+
+router.post('/removetag', album_controller.album_remove_tag);
+
 module.exports = router;
