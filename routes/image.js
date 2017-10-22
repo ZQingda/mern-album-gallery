@@ -19,4 +19,6 @@ router.get('/upload', function(req, res) {
 
 router.post('/upload', upload.array('photo'), image_controller.image_post);
 
+router.post('/update', image_controller.image_update);
+
 module.exports = router;

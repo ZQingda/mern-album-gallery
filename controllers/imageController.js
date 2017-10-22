@@ -15,20 +15,24 @@ exports.image_post = function (req, res, next) {
             console.log('EXIF error: ' + error.message);
         }
 
-        var image = new Image(
-            {
-                path: req.files[0].path,
-                date: !error && exifData.exif.CreateDate ? exifData.exif.CreateDate : !error && exifData.exif.ModifyDate ? exifData.exif.ModifyDate : 'unknown',
-                //albums: albums,
-                exif: {
-                    make: !error && exifData.image.Make ? exifData.image.Make : 'unknown',
-                    model: !error && exifData.image.Model ? exifData.image.Model : 'unknown',
-                    fstop: !error && exifData.exif.FNumber ? exifData.exif.FNumber : 0,
-                    iso: !error && exifData.exif.ISO ? exifData.exif.ISO : 0,
-                    shutterSpeed: !error && exifData.exif.ShutterSpeedValue ? exifData.exif.ShutterSpeedValue : 0,
-                    focalLength: !error && exifData.exif.FocalLength ? exifData.exif.FocalLength : 0
-                }
+        var imageInstance = {
+            path: req.files[0].path,
+            date: !error && exifData.exif.CreateDate ? exifData.exif.CreateDate : !error && exifData.exif.ModifyDate ? exifData.exif.ModifyDate : 'unknown',
+            //albums: albums,
+            exif: {
+                valid : error ? false : true,
+                make: !error && exifData.image.Make ? exifData.image.Make : 'unknown',
+                model: !error && exifData.image.Model ? exifData.image.Model : 'unknown',
+                fstop: !error && exifData.exif.FNumber ? exifData.exif.FNumber : 0,
+                iso: !error && exifData.exif.ISO ? exifData.exif.ISO : 0,
+                shutterSpeed: !error && exifData.exif.ShutterSpeedValue ? exifData.exif.ShutterSpeedValue : 0,
+                focalLength: !error && exifData.exif.FocalLength ? exifData.exif.FocalLength : 0
             }
+        }
+
+
+        var image = new Image(
+            imageInstance
         );
 
         image.save(function (err, i) {
@@ -97,4 +101,28 @@ exports.image_delete = function (req, res, next) {
     res.setHeader('Content-Type', 'application/json');
     res.end();
 
+}
+
+exports.image_update = function(req, res, next) {
+    var imageInfo = {};
+    var keys = ['name', 'description', 'date'];
+    keys.forEach((key, index) => {
+        if (req.body[key]) imageInfo[key] = req.body[key];
+    });
+
+    console.log('IMAGEINFO : ');
+    console.log(imageInfo);
+
+
+    Image.findByIdAndUpdate(
+        req.body.imageId,
+        { $set : imageInfo},
+        function(err) {
+            if(err) {
+                console.log('Image update error : ' + err);
+            }
+            res.setHeader('Content-Type', 'application/json');
+            res.end();
+        }
+    );
 }

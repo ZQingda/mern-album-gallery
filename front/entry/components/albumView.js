@@ -4,6 +4,7 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom';
 
 import Lightbox from './lightbox'
 import AlbumMenu from './albumMenu'
+import ImageEdit from './imageEdit'
 
 
 class AlbumView extends Component {
@@ -214,8 +215,9 @@ class AlbumView extends Component {
         var imagePresentation = images.map((image, index) => {
             var link = image.path.substr(6);
             return (
-                <div className='imgWrap' onClick={this.deleteSelect} key={index}>
+                <div className='imgWrap' key={index}>
                     <img src={link} alt='cannot find' onClick={this.state.delete ? this.select : this.showImage} data-key={index}></img>
+                    <ImageEdit imageId={image._id}/>
                 </div>
             )
         });

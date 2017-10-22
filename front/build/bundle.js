@@ -35322,11 +35322,11 @@
 
 	var _albumView2 = _interopRequireDefault(_albumView);
 
-	var _tagList = __webpack_require__(568);
+	var _tagList = __webpack_require__(569);
 
 	var _tagList2 = _interopRequireDefault(_tagList);
 
-	var _tagView = __webpack_require__(569);
+	var _tagView = __webpack_require__(570);
 
 	var _tagView2 = _interopRequireDefault(_tagView);
 
@@ -38780,6 +38780,10 @@
 
 	var _albumMenu2 = _interopRequireDefault(_albumMenu);
 
+	var _imageEdit = __webpack_require__(568);
+
+	var _imageEdit2 = _interopRequireDefault(_imageEdit);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -39029,8 +39033,9 @@
 	                var link = image.path.substr(6);
 	                return _react2.default.createElement(
 	                    'div',
-	                    { className: 'imgWrap', onClick: _this5.deleteSelect, key: index },
-	                    _react2.default.createElement('img', { src: link, alt: 'cannot find', onClick: _this5.state.delete ? _this5.select : _this5.showImage, 'data-key': index })
+	                    { className: 'imgWrap', key: index },
+	                    _react2.default.createElement('img', { src: link, alt: 'cannot find', onClick: _this5.state.delete ? _this5.select : _this5.showImage, 'data-key': index }),
+	                    _react2.default.createElement(_imageEdit2.default, { imageId: image._id })
 	                );
 	            });
 
@@ -39266,6 +39271,125 @@
 
 	var _superagent2 = _interopRequireDefault(_superagent);
 
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var ImageEdit = function (_Component) {
+	    _inherits(ImageEdit, _Component);
+
+	    function ImageEdit(props) {
+	        _classCallCheck(this, ImageEdit);
+
+	        var _this = _possibleConstructorReturn(this, (ImageEdit.__proto__ || Object.getPrototypeOf(ImageEdit)).call(this, props));
+
+	        _this.state = {
+	            edit: false,
+	            name: '',
+	            description: ''
+	        };
+
+	        _this.edit = _this.edit.bind(_this);
+	        _this.handleEditSubmit = _this.handleEditSubmit.bind(_this);
+	        _this.handleDescChange = _this.handleDescChange.bind(_this);
+	        _this.handleNameChange = _this.handleNameChange.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(ImageEdit, [{
+	        key: 'edit',
+	        value: function edit() {
+	            this.setState({
+	                edit: true
+	            });
+	        }
+	    }, {
+	        key: 'handleEditSubmit',
+	        value: function handleEditSubmit(e) {
+	            e.preventDefault();
+	            _superagent2.default.post('http://192.168.50.117:3001/image/update').send({
+	                imageId: this.props.imageId,
+	                name: this.state.name,
+	                description: this.state.description
+	            }).end(function (err, res) {
+	                if (err) {
+	                    console.log('handleEditSubmit error : ' + err);
+	                }
+	            });
+
+	            this.setState({ edit: false });
+	        }
+	    }, {
+	        key: 'handleNameChange',
+	        value: function handleNameChange(e) {
+	            this.setState({ name: e.target.value });
+	        }
+	    }, {
+	        key: 'handleDescChange',
+	        value: function handleDescChange(e) {
+	            this.setState({ description: e.target.value });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'imageEdit' },
+	                !this.state.edit && _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.edit },
+	                    'Edit'
+	                ),
+	                this.state.edit && _react2.default.createElement(
+	                    'form',
+	                    { onSubmit: this.handleEditSubmit, id: 'imageFields' },
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'imageName' },
+	                        'Title'
+	                    ),
+	                    _react2.default.createElement('input', { type: 'text', name: 'imageName', id: 'imageName', onChange: this.handleNameChange }),
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'imageDesc' },
+	                        'Caption'
+	                    ),
+	                    _react2.default.createElement('input', { type: 'text', name: 'imageDesc', id: 'imageDesc', onChange: this.handleDescChange }),
+	                    _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
+	                )
+	            );
+	        }
+	    }]);
+
+	    return ImageEdit;
+	}(_react.Component);
+
+	exports.default = ImageEdit;
+
+/***/ }),
+/* 569 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(328);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _superagent = __webpack_require__(556);
+
+	var _superagent2 = _interopRequireDefault(_superagent);
+
 	var _reactRouterDom = __webpack_require__(513);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -39345,7 +39469,7 @@
 	exports.default = TagList;
 
 /***/ }),
-/* 569 */
+/* 570 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
