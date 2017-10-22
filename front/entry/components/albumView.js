@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import request from 'superagent';
 import { Switch, Route, Link, Redirect } from 'react-router-dom';
 
-import Upload from './upload'
 import Lightbox from './lightbox'
+import AlbumMenu from './albumMenu'
 
 
 class AlbumView extends Component {
@@ -44,6 +44,8 @@ class AlbumView extends Component {
                 .query(albumQuery)
                 .end((err, res) => {
                     if (err) { console.log('HANDLE ERROR: ' + err); }
+                    console.log('ALBUM VIEW RES : ');
+                    console.log(res.body);
                     this.setState({
                         images: res.body.album.images ? res.body.album.images : res.body.images,
                         album: res.body.album ? res.body.album : null
@@ -51,14 +53,16 @@ class AlbumView extends Component {
                     console.log('Tried getting');
                 });
         }
-        else if (this.props.location.state.tagid) {
-            var tagQuery = this.props.location.state.tagid;
+        else if (this.props.location.state.tagId) {
+            var tagQuery = {tagId : this.props.location.state.tagId};
             request.get('http://192.168.50.117:3001/tag/getall')
                 .query(tagQuery)
                 .end((err, res) => {
+                    console.log('ALBUM VIEW RES : ');
+                    console.log(res.body);
                     if (err) { console.log('HANDLE TAG ALL ERR : ' + err); }
                     this.setState({
-                        images: res.body
+                        images: res.body.images
                     })
                 });
         }
@@ -198,6 +202,7 @@ class AlbumView extends Component {
     }
     componentDidMount() {
         this.getAlbum();
+        console.log(this.props.location.state);
     }
 
     render() {
@@ -215,36 +220,38 @@ class AlbumView extends Component {
             )
         });
 
-        var tags = this.state.album.tags ? this.state.album.tags.map((tag, index) => {
+        /* var tags = this.state.album.tags ? this.state.album.tags.map((tag, index) => {
             return (
                 <div className='tagWrap' key={index}>
                     {tag.name}
                     <button onClick={this.removeTag} data-tag={index}>Delete tag</button>
                 </div>
             )
-        }) : null;
+        }) : null; */
 
         if (this.state.backToList) {
             return <Redirect push to='/albums' />
         } else {
             return (
                 <div className='ABCD'>
-                    <Upload albumid={albumid} update={this.getAlbum} />
-                    {this.props.location.state.albumid != 'all' &&
-                        <button onClick={this.deleteAlbum}>Delete album</button>}
-                    {this.state.delete ?
-                        <button onClick={this.handleDeletion}>Delete</button>
-                        :
-                        <button onClick={this.toggleDeletion}>Select for deletion</button>
+                    
+                    {!this.props.location.state.tagId &&
+                    <AlbumMenu 
+                        albumid={albumid}
+                        getAlbum={this.getAlbum}
+                        deleteAlbum={this.deleteAlbum}
+                        delete={this.state.delete}
+                        handleDeletion={this.handleDeletion}
+                        toggleDeletion={this.toggleDeletion}
+                        addTags={this.addTags}
+                        handleNewTagsChange={this.handleNewTagsChange}
+                        tags={this.state.album.tags ? this.state.album.tags : undefined}
+                        removeTag={this.removeTag}
+                        />
                     }
-                    {this.state.delete ? 'DELETE IS ON' : 'DELETE IS OFF'}
-                    {tags}
+
                     {imagePresentation}
-                    <form onSubmit={this.addTags} id='newTags'>
-                        <label htmlFor='albumNewTags'>New Tag(s)</label>
-                        <input type='text' name='albumNewTags' id='albumNewTags' onChange={this.handleNewTagsChange} />
-                        <input type="submit" value="Submit" />
-                    </form>
+
 
                     <Lightbox
                         imageCount={this.state.images.length}

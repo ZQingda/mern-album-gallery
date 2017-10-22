@@ -7,6 +7,8 @@ import Upload from './components/upload';
 import AlbumCreate from './components/albumCreate';
 import AlbumList from './components/albumList';
 import AlbumView from './components/albumView';
+import TagList from './components/tagList';
+import TagView from './components/tagView';
 
 class App extends Component {
 
@@ -15,12 +17,16 @@ class App extends Component {
       <div className="App">
         <Link to={`/image/upload`}>Image Upload</Link><br/>
         <Link to={`/album/create`}>Album Create</Link><br/>
-        <Link to={`/albums`}>Album List</Link>
+        <Link to={`/albums`}>Album List</Link><br />
+        <Link to={`/tags`}>Tags</Link>
         <Switch>
           <Route path='/image/upload' component={Upload} />
           <Route path='/album/create' component={AlbumCreate} />
           <Route exact path='/albums' component={AlbumList} />
-          <Route path='/albums/:albumid' component={AlbumView} />
+          <Route path='/albums/:albumname' component={AlbumView} />
+          <Route path='/tags' component={TagList} />
+          <Route exact path='/tag/:tagname' component={TagView} />
+          <Route path='/tag/:tagname/all' component={AlbumView} />
         </Switch>
       </div>
     );

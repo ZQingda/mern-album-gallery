@@ -35322,6 +35322,14 @@
 
 	var _albumView2 = _interopRequireDefault(_albumView);
 
+	var _tagList = __webpack_require__(568);
+
+	var _tagList2 = _interopRequireDefault(_tagList);
+
+	var _tagView = __webpack_require__(569);
+
+	var _tagView2 = _interopRequireDefault(_tagView);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -35364,13 +35372,22 @@
 	          { to: '/albums' },
 	          'Album List'
 	        ),
+	        _react2.default.createElement('br', null),
+	        _react2.default.createElement(
+	          _reactRouterDom.Link,
+	          { to: '/tags' },
+	          'Tags'
+	        ),
 	        _react2.default.createElement(
 	          _reactRouterDom.Switch,
 	          null,
 	          _react2.default.createElement(_reactRouterDom.Route, { path: '/image/upload', component: _upload2.default }),
 	          _react2.default.createElement(_reactRouterDom.Route, { path: '/album/create', component: _albumCreate2.default }),
 	          _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/albums', component: _albumList2.default }),
-	          _react2.default.createElement(_reactRouterDom.Route, { path: '/albums/:albumid', component: _albumView2.default })
+	          _react2.default.createElement(_reactRouterDom.Route, { path: '/albums/:albumname', component: _albumView2.default }),
+	          _react2.default.createElement(_reactRouterDom.Route, { path: '/tags', component: _tagList2.default }),
+	          _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/tag/:tagname', component: _tagView2.default }),
+	          _react2.default.createElement(_reactRouterDom.Route, { path: '/tag/:tagname/all', component: _albumView2.default })
 	        )
 	      );
 	    }
@@ -35475,15 +35492,15 @@
 	            console.log('=== Form created ===');*/
 
 	            _superagent2.default.post('http://192.168.50.117:3001/image/upload').send(formData).end(function (err, res) {
+	                console.log('ended post image');
 	                if (err) {
 	                    console.log('HANDLE ERROR: ' + err);
 	                }
 
 	                if (typeof _this3.props.update === 'function') {
+	                    console.log('CALLED UPDATE GETALBUM');
 	                    _this3.props.update();
 	                }
-
-	                return res;
 	            });
 	        }
 	    }, {
@@ -38755,13 +38772,13 @@
 
 	var _reactRouterDom = __webpack_require__(513);
 
-	var _upload = __webpack_require__(554);
-
-	var _upload2 = _interopRequireDefault(_upload);
-
 	var _lightbox = __webpack_require__(566);
 
 	var _lightbox2 = _interopRequireDefault(_lightbox);
+
+	var _albumMenu = __webpack_require__(567);
+
+	var _albumMenu2 = _interopRequireDefault(_albumMenu);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38818,20 +38835,24 @@
 	                    if (err) {
 	                        console.log('HANDLE ERROR: ' + err);
 	                    }
+	                    console.log('ALBUM VIEW RES : ');
+	                    console.log(res.body);
 	                    _this2.setState({
 	                        images: res.body.album.images ? res.body.album.images : res.body.images,
 	                        album: res.body.album ? res.body.album : null
 	                    });
 	                    console.log('Tried getting');
 	                });
-	            } else if (this.props.location.state.tagid) {
-	                var tagQuery = this.props.location.state.tagid;
+	            } else if (this.props.location.state.tagId) {
+	                var tagQuery = { tagId: this.props.location.state.tagId };
 	                _superagent2.default.get('http://192.168.50.117:3001/tag/getall').query(tagQuery).end(function (err, res) {
+	                    console.log('ALBUM VIEW RES : ');
+	                    console.log(res.body);
 	                    if (err) {
 	                        console.log('HANDLE TAG ALL ERR : ' + err);
 	                    }
 	                    _this2.setState({
-	                        images: res.body
+	                        images: res.body.images
 	                    });
 	                });
 	            }
@@ -38992,6 +39013,7 @@
 	        key: 'componentDidMount',
 	        value: function componentDidMount() {
 	            this.getAlbum();
+	            console.log(this.props.location.state);
 	        }
 	    }, {
 	        key: 'render',
@@ -39012,18 +39034,14 @@
 	                );
 	            });
 
-	            var tags = this.state.album.tags ? this.state.album.tags.map(function (tag, index) {
-	                return _react2.default.createElement(
-	                    'div',
-	                    { className: 'tagWrap', key: index },
-	                    tag.name,
-	                    _react2.default.createElement(
-	                        'button',
-	                        { onClick: _this5.removeTag, 'data-tag': index },
-	                        'Delete tag'
-	                    )
-	                );
-	            }) : null;
+	            /* var tags = this.state.album.tags ? this.state.album.tags.map((tag, index) => {
+	                return (
+	                    <div className='tagWrap' key={index}>
+	                        {tag.name}
+	                        <button onClick={this.removeTag} data-tag={index}>Delete tag</button>
+	                    </div>
+	                )
+	            }) : null; */
 
 	            if (this.state.backToList) {
 	                return _react2.default.createElement(_reactRouterDom.Redirect, { push: true, to: '/albums' });
@@ -39031,35 +39049,19 @@
 	                return _react2.default.createElement(
 	                    'div',
 	                    { className: 'ABCD' },
-	                    _react2.default.createElement(_upload2.default, { albumid: albumid, update: this.getAlbum }),
-	                    this.props.location.state.albumid != 'all' && _react2.default.createElement(
-	                        'button',
-	                        { onClick: this.deleteAlbum },
-	                        'Delete album'
-	                    ),
-	                    this.state.delete ? _react2.default.createElement(
-	                        'button',
-	                        { onClick: this.handleDeletion },
-	                        'Delete'
-	                    ) : _react2.default.createElement(
-	                        'button',
-	                        { onClick: this.toggleDeletion },
-	                        'Select for deletion'
-	                    ),
-	                    this.state.delete ? 'DELETE IS ON' : 'DELETE IS OFF',
-	                    tags,
+	                    !this.props.location.state.tagId && _react2.default.createElement(_albumMenu2.default, {
+	                        albumid: albumid,
+	                        getAlbum: this.getAlbum,
+	                        deleteAlbum: this.deleteAlbum,
+	                        'delete': this.state.delete,
+	                        handleDeletion: this.handleDeletion,
+	                        toggleDeletion: this.toggleDeletion,
+	                        addTags: this.addTags,
+	                        handleNewTagsChange: this.handleNewTagsChange,
+	                        tags: this.state.album.tags ? this.state.album.tags : undefined,
+	                        removeTag: this.removeTag
+	                    }),
 	                    imagePresentation,
-	                    _react2.default.createElement(
-	                        'form',
-	                        { onSubmit: this.addTags, id: 'newTags' },
-	                        _react2.default.createElement(
-	                            'label',
-	                            { htmlFor: 'albumNewTags' },
-	                            'New Tag(s)'
-	                        ),
-	                        _react2.default.createElement('input', { type: 'text', name: 'albumNewTags', id: 'albumNewTags', onChange: this.handleNewTagsChange }),
-	                        _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
-	                    ),
 	                    _react2.default.createElement(_lightbox2.default, {
 	                        imageCount: this.state.images.length,
 	                        currentIndex: this.state.currentIndex,
@@ -39142,6 +39144,318 @@
 	}(_react.Component);
 
 	exports.default = Lightbox;
+
+/***/ }),
+/* 567 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(328);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _superagent = __webpack_require__(556);
+
+	var _superagent2 = _interopRequireDefault(_superagent);
+
+	var _reactRouterDom = __webpack_require__(513);
+
+	var _upload = __webpack_require__(554);
+
+	var _upload2 = _interopRequireDefault(_upload);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var AlbumMenu = function (_Component) {
+	    _inherits(AlbumMenu, _Component);
+
+	    function AlbumMenu(props) {
+	        _classCallCheck(this, AlbumMenu);
+
+	        return _possibleConstructorReturn(this, (AlbumMenu.__proto__ || Object.getPrototypeOf(AlbumMenu)).call(this, props));
+	    }
+
+	    _createClass(AlbumMenu, [{
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var tags = this.props.tags ? this.props.tags.map(function (tag, index) {
+	                return _react2.default.createElement(
+	                    'div',
+	                    { className: 'tagWrap', key: index },
+	                    tag.name,
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: _this2.props.removeTag, 'data-tag': index },
+	                        'Delete tag'
+	                    )
+	                );
+	            }) : null;
+
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'AlbumMenu' },
+	                _react2.default.createElement(_upload2.default, { albumid: this.props.albumid, update: this.props.getAlbum }),
+	                this.props.albumid != 'all' && _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.props.deleteAlbum },
+	                    'Delete album'
+	                ),
+	                this.props.delete ? _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.props.handleDeletion },
+	                    'Delete'
+	                ) : _react2.default.createElement(
+	                    'button',
+	                    { onClick: this.props.toggleDeletion },
+	                    'Select for deletion'
+	                ),
+	                this.props.delete ? 'DELETE IS ON' : 'DELETE IS OFF',
+	                _react2.default.createElement(
+	                    'form',
+	                    { onSubmit: this.props.addTags, id: 'newTags' },
+	                    _react2.default.createElement(
+	                        'label',
+	                        { htmlFor: 'albumNewTags' },
+	                        'New Tag(s)'
+	                    ),
+	                    _react2.default.createElement('input', { type: 'text', name: 'albumNewTags', id: 'albumNewTags', onChange: this.props.handleNewTagsChange }),
+	                    _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
+	                ),
+	                tags
+	            );
+	        }
+	    }]);
+
+	    return AlbumMenu;
+	}(_react.Component);
+
+	exports.default = AlbumMenu;
+
+/***/ }),
+/* 568 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(328);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _superagent = __webpack_require__(556);
+
+	var _superagent2 = _interopRequireDefault(_superagent);
+
+	var _reactRouterDom = __webpack_require__(513);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TagList = function (_Component) {
+	    _inherits(TagList, _Component);
+
+	    function TagList(props) {
+	        _classCallCheck(this, TagList);
+
+	        var _this = _possibleConstructorReturn(this, (TagList.__proto__ || Object.getPrototypeOf(TagList)).call(this, props));
+
+	        _this.state = {
+	            tags: []
+	        };
+
+	        _this.componentDidMount = _this.componentDidMount.bind(_this);
+	        _this.setState = _this.setState.bind(_this);
+
+	        return _this;
+	    }
+
+	    _createClass(TagList, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var _this2 = this;
+
+	            _superagent2.default.get('http://192.168.50.117:3001/tag/list').end(function (err, res) {
+	                if (err) {
+	                    console.log('HANDLE ERROR: ' + err);
+	                }
+	                //console.log(res.body[0]);
+	                _this2.setState({ tags: res.body });
+	                //console.log(this.state.albums);
+	                return res;
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var tagNav = this.state.tags.map(function (tag) {
+	                console.log(tag._id);
+	                return _react2.default.createElement(
+	                    'li',
+	                    { key: tag._id },
+	                    _react2.default.createElement(
+	                        _reactRouterDom.Link,
+	                        { to: {
+	                                pathname: '/tag/' + tag.name,
+	                                state: { tagId: tag._id }
+	                            } },
+	                        tag.name
+	                    )
+	                );
+	            });
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'TagList' },
+	                _react2.default.createElement(
+	                    'ul',
+	                    null,
+	                    tagNav
+	                )
+	            );
+	        }
+	    }]);
+
+	    return TagList;
+	}(_react.Component);
+
+	exports.default = TagList;
+
+/***/ }),
+/* 569 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(328);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _superagent = __webpack_require__(556);
+
+	var _superagent2 = _interopRequireDefault(_superagent);
+
+	var _reactRouterDom = __webpack_require__(513);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var TagView = function (_Component) {
+	    _inherits(TagView, _Component);
+
+	    function TagView(props) {
+	        _classCallCheck(this, TagView);
+
+	        var _this = _possibleConstructorReturn(this, (TagView.__proto__ || Object.getPrototypeOf(TagView)).call(this, props));
+
+	        _this.state = {
+	            tag: {}
+	        };
+
+	        _this.componentDidMount = _this.componentDidMount.bind(_this);
+	        _this.setState = _this.setState.bind(_this);
+
+	        return _this;
+	    }
+
+	    _createClass(TagView, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            var _this2 = this;
+
+	            console.log(this.props.location.state);
+	            var tagQuery = { tagId: this.props.location.state.tagId };
+	            _superagent2.default.get('http://192.168.50.117:3001/tag/get').query(tagQuery).end(function (err, res) {
+	                if (err) {
+	                    console.log('HANDLE ERROR: ' + err);
+	                }
+	                //console.log(res.body[0]);
+	                console.log('TAG INFO: ');
+	                console.log(res.body);
+	                _this2.setState({ tag: res.body });
+	                //console.log(this.state.albums);
+	                return res;
+	            });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var albumNav = this.state.tag.albums ? this.state.tag.albums.map(function (album) {
+	                return _react2.default.createElement(
+	                    'li',
+	                    { key: album._id },
+	                    _react2.default.createElement(
+	                        _reactRouterDom.Link,
+	                        { to: {
+	                                pathname: '/albums/' + album.name,
+	                                state: { albumid: album._id }
+	                            } },
+	                        album.name
+	                    )
+	                );
+	            }) : null;
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'TagView' },
+	                _react2.default.createElement(
+	                    'ul',
+	                    null,
+	                    _react2.default.createElement(
+	                        'li',
+	                        null,
+	                        _react2.default.createElement(
+	                            _reactRouterDom.Link,
+	                            { to: {
+	                                    pathname: '/tag/' + this.state.tag.name + '/all',
+	                                    state: { tagId: this.state.tag._id
+	                                    } } },
+	                            'All images'
+	                        )
+	                    ),
+	                    albumNav
+	                )
+	            );
+	        }
+	    }]);
+
+	    return TagView;
+	}(_react.Component);
+
+	exports.default = TagView;
 
 /***/ })
 /******/ ]);

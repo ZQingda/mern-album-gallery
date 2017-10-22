@@ -19,13 +19,15 @@ exports.tag_list = function (req, res, next) {
 }
 
 exports.tag_get = function (req, res, next) {
-    Tag.find({ name: req.body.tagName })
+    Tag.findById(req.query.tagId)
         .populate('albums')
         .exec(function (err, tag) {
             if (err) {
                 console.log('Tag get error : ' + err);
                 return next(err);
             }
+            console.log(req.query);
+            console.log(tag);
 
             res.setHeader('Content-Type', 'application/json');
             res.send(tag);
@@ -34,7 +36,7 @@ exports.tag_get = function (req, res, next) {
 
 exports.tag_get_images = function (req, res, next) {
 
-    Tag.find({ name: req.body.tagName })
+    Tag.findById(req.query.tagId)
         .populate({
             path: 'albums',
             populate: { path: 'images' }
@@ -49,8 +51,8 @@ exports.tag_get_images = function (req, res, next) {
                 return total.concat(current.images);
             }, []);
 
-            res.setHeader('Content-Type', 'application//json');
-            res.send(allImages);
+            res.setHeader('Content-Type', 'application/json');
+            res.send({images : allImages});
 
         })
 

@@ -118,7 +118,7 @@ exports.album_create = function (req, res, next) {
     //console.log(req.body.albumName ? req.body.albumName : "nope!!!!");
 
     //console.log(req.body.albumTags);
-    var tags = req.body.albumTags.split(/\s*[\s,]\s*/);
+    var tags = req.body.albumTags ? req.body.albumTags.split(/\s*[\s,]\s*/) : false;
 
     var album = new Album(
         {
@@ -136,7 +136,9 @@ exports.album_create = function (req, res, next) {
             return next(err);
         }
 
-        tag_create(a._id, tags);
+        if (tags) {
+            tag_create(a._id, tags);
+        }
 
     });
 

@@ -30,14 +30,19 @@ class TagList extends Component {
     }
 
     render() {
-        var tagNav = this.state.tags.map((tag) =>
-            <li key={tag._id}><Link to={{
-                pathname: `/tag/${tag.name}`,
-                state: {tagid: tag._id}
-            }}>{tag.name}</Link></li>
+        var tagNav = this.state.tags.map((tag) => {
+            console.log(tag._id);
+            return (
+                <li key={tag._id}><Link to={{
+                    pathname: `/tag/${tag.name}`,
+                    state: {tagId: tag._id}
+                }}>{tag.name}</Link></li>
+            )
+        }
+            
         );
         return (
-            <div className='ABCD'>
+            <div className='TagList'>
                 <ul>
                     {tagNav}
                 </ul>

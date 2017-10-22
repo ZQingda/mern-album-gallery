@@ -45,16 +45,20 @@ exports.image_post = function (req, res, next) {
                                     console.log('Album update error');
                                     return next(err);
                                 }
+                                res.setHeader('Content-Type', 'application/json');
+                                res.end(req.file);
                             }
                         )
                     });
+                } else {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(req.file);
                 }
             }
         });
 
 
-        res.setHeader('Content-Type', 'application/json');
-        res.end(req.file);
+        
     });
 
     //res.end(req.file);
